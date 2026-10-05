@@ -161,18 +161,7 @@ print(data['next']['broadcast_text']) # 10月9日よる9時放送
 
 ---
 
-## 🗂️ ファイル構成
 
-```
-kinro-gas-api/
-├── Code.gs          # GAS メインスクリプト
-├── appsscript.json  # GAS マニフェスト
-└── README.md        # このファイル
-```
-
-
-
----
 
 ## ⚠️ 注意事項
 
