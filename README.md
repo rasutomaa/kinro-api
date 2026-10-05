@@ -6,7 +6,7 @@ Google Apps Script (GAS) で動作し、公式サイト [kinro.ntv.co.jp](https:
 ## 🌐 エンドポイント
 
 ```
-https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQkJBBQsbmdGx9GLxRzXatGC5P2gwvIXk1m8bX3Tf2ajEIcb0ddSXqh4tTdcC0xnWGa-UGryHPr1LOp-gEho_E_loc0ynztBSNhW7jrQXB9wbYdZy4f5hFHmUp1btxLCek5w0N-jbc0gFDWUOOLHU3paTFuxMEPCSfJkp04Vx1ioP-DLsmYR9nsRdU6A3vv1QxIVoDmVWA1XZTKHIsCYRdXUiuZSF_OAS3dFKassz6Fn42Er-5AUf7Kmc7Iwfjc_lH8Zzo7KloGhdtup3O4jnZfuZ2yVQ&lib=M41K_Te66T4SbLhS9uzCT5roAJDTgNfzb
+https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv8rogSjVw1-1SUEdiaL88ZcBZfFg/exec
 ```
 
 ---
