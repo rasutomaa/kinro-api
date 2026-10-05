@@ -168,4 +168,3 @@ print(data['next']['broadcast_text']) # 10月9日よる9時放送
 - 本ツールは個人・学習・非商用目的での利用を想定しています
 - 公式サイトの HTML 構造が変わるとパースが壊れる場合があります
 - レスポンスは **1時間キャッシュ** されます（`CACHE_TTL_SECONDS` で変更可能）
-- 日本テレビの[利用規約](https://www.ntv.co.jp/info/terms.html)を遵守してご利用ください
