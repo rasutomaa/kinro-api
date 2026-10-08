@@ -1,5 +1,8 @@
 # 金曜ロードショー API
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+
 日本テレビ「金曜ロードショー」の放送スケジュールを JSON で返す非公式 Web API。  
 Google Apps Script (GAS) で動作し、公式サイト [kinro.ntv.co.jp](https://kinro.ntv.co.jp/) から情報を取得する。
 
