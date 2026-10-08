@@ -1,7 +1,19 @@
-# 📽️ 金曜ロードショー API
+# 📽️ 金曜ロードショー API（改訂版）
 
-日本テレビ「金曜ロードショー」の放送スケジュールを JSON で返す非公式 Web API です。  
-Google Apps Script (GAS) で動作し、公式サイト [kinro.ntv.co.jp](https://kinro.ntv.co.jp/) から情報を取得します。
+日本テレビ「金曜ロードショー」の放送スケジュールを JSON で返す非公式 Web API。  
+Google Apps Script (GAS) で動作し、公式サイト [kinro.ntv.co.jp](https://kinro.ntv.co.jp/) から情報を取得する。
+
+## 🔧 改訂ポイント
+
+| # | 元の状態 | 改訂後 |
+|---|---|---|
+| 1 | エンドポイントURLが2種類存在 | **1つに統一** |
+| 2 | 日付形式がバラバラ | `date` と `date_key` の2種類に**統一** |
+| 3 | `?type=detail` のレスポンス仕様が無い | **仕様を追加** |
+| 4 | `?callback=` の仕様・例が無い | **JSONP仕様と例を追加** |
+| 5 | エラー例が1パターンのみ | **エラー一覧を明記** |
+
+---
 
 ## 🌐 エンドポイント
 
@@ -9,147 +21,152 @@ Google Apps Script (GAS) で動作し、公式サイト [kinro.ntv.co.jp](https:
 https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv8rogSjVw1-1SUEdiaL88ZcBZfFg/exec
 ```
 
----
-
-## 📡 API リファレンス
-
-| パラメータ | 説明 |
-|---|---|
-| *(なし)* | 全データ（次回放送 + ラインナップ + ニュース） |
-| `?type=next` | 次回放送のみ |
-| `?type=lineup` | 放送ラインナップ一覧 |
-| `?type=detail&date=YYYYMMDD` | 特定日の詳細 |
-| `?type=news` | 新着ニュース一覧 |
-| `?callback=関数名` | JSONP 形式で返す |
+> 元ドキュメントでは使用例側に別の Script ID が混在していたが、本改訂版では上記1つに統一する。  
+> 以降の例では `BASE` にこのURLを代入する。
 
 ---
 
-## 💻 使用例
+## 📡 パラメータ
 
-### curl
+| パラメータ | 値 | 説明 |
+|---|---|---|
+| `type` | 省略 / `next` / `lineup` / `detail` / `news` | 取得するデータ種別。省略時は全データ |
+| `date` | `YYYYMMDD` | `type=detail` のとき必須 |
+| `callback` | 関数名 | 指定時は JSONP 形式で返す |
 
-```bash
-# リダイレクトがあるので -L が必要
-curl -L "https://script.google.com/macros/s/AKfycbydtL5-KrZ7Oha7ZlZ8BAuuHiFqHlhMtCAryPyNN7b3GZZJhkEJgbZTDjfeulLOfF4z/exec"
+---
 
-# 次回放送だけ
-curl -L "...exec?type=next"
+## 📅 日付フィールドの統一ルール
 
-# 特定日の詳細
-curl -L "...exec?type=detail&date=20261009"
-```
-
-### JavaScript (fetch)
-
-```javascript
-const BASE = 'https://script.google.com/macros/s/AKfycbydtL5-KrZ7Oha7ZlZ8BAuuHiFqHlhMtCAryPyNN7b3GZZJhkEJgbZTDjfeulLOfF4z/exec';
-
-const res = await fetch(BASE);
-const data = await res.json();
-
-console.log(data.next.title);         // "インサイド・ヘッド"
-console.log(data.next.broadcast_text); // "10月9日よる9時放送"
-console.log(data.next.youtube_url);   // "https://www.youtube.com/watch?v=..."
-```
-
-### Python
-
-```python
-import requests
-
-BASE = 'https://script.google.com/macros/s/AKfycbydtL5-KrZ7Oha7ZlZ8BAuuHiFqHlhMtCAryPyNN7b3GZZJhkEJgbZTDjfeulLOfF4z/exec'
-
-res = requests.get(BASE, params={'type': 'next'})
-data = res.json()
-
-print(data['next']['title'])          # インサイド・ヘッド
-print(data['next']['broadcast_text']) # 10月9日よる9時放送
-```
+| フィールド | 形式 | 用途 |
+|---|---|---|
+| `date` | `YYYY.MM.DD` | 画面表示用 |
+| `date_key` | `YYYYMMDD` | `?date=` にそのまま渡せる |
+| `published_at` | `YYYY.MM.DD` | ニュース公開日 |
+| `fetched_at` | ISO 8601（`+09:00`） | データ取得時刻 |
 
 ---
 
 ## 📦 レスポンス仕様
 
-### `GET /exec` — 全データ
+### 共通フィールド
+
+```json
+{
+  "status": "ok",
+  "fetched_at": "2026-10-05T13:15:28+09:00"
+}
+```
+
+### `type` 省略 — 全データ
+
+```json
+{
+  "status": "ok",
+  "fetched_at": "2026-10-05T13:15:28+09:00",
+  "next": { "...": "下記 next を参照" },
+  "lineup": [ { "...": "下記 lineup[] を参照" } ],
+  "news": [ { "...": "下記 news[] を参照" } ]
+}
+```
+
+### `?type=next` — 次回放送のみ
 
 ```json
 {
   "status": "ok",
   "fetched_at": "2026-10-05T13:15:28+09:00",
   "next": {
+    "date": "2026.10.09",
+    "date_key": "20261009",
     "broadcast_text": "10月9日よる9時放送",
     "title": "インサイド・ヘッド",
     "url": "https://kinro.ntv.co.jp/lineup/20261009",
-    "date": "20261009",
     "thumbnail": "https://dtg3yjoeemd2c.cloudfront.net/cms/lineup/xxx.jpg",
     "want_to_watch": 18383,
     "youtube_id": "hgq0jBFM48w",
     "youtube_url": "https://www.youtube.com/watch?v=hgq0jBFM48w"
-  },
+  }
+}
+```
+
+| フィールド | 型 | 説明 |
+|---|---|---|
+| `date` | string | 放送日（表示用 `YYYY.MM.DD`） |
+| `date_key` | string | 放送日（`YYYYMMDD`） |
+| `broadcast_text` | string | 放送日時テキスト |
+| `title` | string | 映画タイトル |
+| `url` | string | 公式サイト作品ページ |
+| `thumbnail` | string | サムネイル画像 URL |
+| `want_to_watch` | number | 「みたい！」数 |
+| `youtube_id` | string \| null | YouTube 予告 ID |
+| `youtube_url` | string \| null | YouTube 予告 URL |
+
+### `?type=lineup` — ラインナップ一覧
+
+```json
+{
+  "status": "ok",
+  "fetched_at": "2026-10-05T13:15:28+09:00",
   "lineup": [
     {
       "date": "2026.10.16",
+      "date_key": "20261016",
       "title": "インサイド・ヘッド2",
       "url": "https://kinro.ntv.co.jp/lineup/20261016",
-      "date_key": "20261016",
       "thumbnail": "https://...",
       "want_to_watch": 12726
-    },
-    {
-      "date": "2026.10.23",
-      "title": "ALWAYS 三丁目の夕日",
-      "url": "https://kinro.ntv.co.jp/lineup/20261023",
-      "date_key": "20261023",
-      "thumbnail": "https://...",
-      "want_to_watch": 1418
-    },
-    {
-      "date": "2026.10.30",
-      "title": "ゴジラ-1.0",
-      "url": "https://kinro.ntv.co.jp/lineup/20261030",
-      "date_key": "20261030",
-      "thumbnail": "https://...",
-      "want_to_watch": 2072
     }
-  ],
+  ]
+}
+```
+
+### `?type=detail&date=YYYYMMDD` — 特定日の詳細
+
+```json
+{
+  "status": "ok",
+  "fetched_at": "2026-10-05T13:15:28+09:00",
+  "detail": {
+    "date": "2026.10.09",
+    "date_key": "20261009",
+    "broadcast_text": "10月9日よる9時放送",
+    "title": "インサイド・ヘッド",
+    "url": "https://kinro.ntv.co.jp/lineup/20261009",
+    "thumbnail": "https://...",
+    "want_to_watch": 18383,
+    "youtube_id": "hgq0jBFM48w",
+    "youtube_url": "https://www.youtube.com/watch?v=hgq0jBFM48w"
+  }
+}
+```
+
+### `?type=news` — 新着ニュース
+
+```json
+{
+  "status": "ok",
+  "fetched_at": "2026-10-05T13:15:28+09:00",
   "news": [
     {
       "url": "https://kinro.ntv.co.jp/article/detail/20261002",
       "title": "『ゴジラ-0.0』公開記念!! 2週連続・山崎貴監督作品を放送！...",
-      "published_at": "2026.10.2",
+      "published_at": "2026.10.02",
       "thumbnail": "https://..."
     }
   ]
 }
 ```
 
-### フィールド説明
+### `?callback=関数名` — JSONP
 
-#### `next` — 次回放送
+`Content-Type: application/javascript`
 
-| フィールド | 型 | 説明 |
-|---|---|---|
-| `broadcast_text` | string | 放送日時テキスト（例: "10月9日よる9時放送"） |
-| `title` | string | 映画タイトル |
-| `url` | string | 公式サイトの作品ページ URL |
-| `date` | string | 放送日 (YYYYMMDD) |
-| `thumbnail` | string | サムネイル画像 URL |
-| `want_to_watch` | number | 「みたい！」ボタンの押された数 |
-| `youtube_id` | string \| null | YouTube 予告動画 ID |
-| `youtube_url` | string \| null | YouTube 予告動画 URL |
+```javascript
+cb({"status":"ok","fetched_at":"...","next":{...}});
+```
 
-#### `lineup[]` — ラインナップ
-
-| フィールド | 型 | 説明 |
-|---|---|---|
-| `date` | string | 放送日（例: "2026.10.16"） |
-| `title` | string | 映画タイトル |
-| `url` | string | 公式サイトの作品ページ URL |
-| `date_key` | string | 放送日 (YYYYMMDD) |
-| `thumbnail` | string | サムネイル画像 URL |
-| `want_to_watch` | number | 「みたい！」ボタンの押された数 |
-
-#### エラー時
+### エラー時
 
 ```json
 {
@@ -159,12 +176,63 @@ print(data['next']['broadcast_text']) # 10月9日よる9時放送
 }
 ```
 
+| 条件 | `message` |
+|---|---|
+| `type=detail` で `date` 未指定 | `date パラメータが必要です (例: date=20261009)` |
+| `type=detail` で該当なし | `指定日のデータが見つかりません: 20261009` |
+| 不明な `type` | `不明な type です: xxxx` |
+| 公式サイト取得失敗 | `公式サイトの取得に失敗しました` |
+
 ---
 
+## 💻 使用例
 
+### curl
+
+```bash
+BASE="https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv8rogSjVw1-1SUEdiaL88ZcBZfFg/exec"
+
+# リダイレクトがあるので -L が必要
+curl -L "$BASE"
+curl -L "$BASE?type=next"
+curl -L "$BASE?type=lineup"
+curl -L "$BASE?type=detail&date=20261009"
+curl -L "$BASE?type=news"
+curl -L "$BASE?callback=cb"
+```
+
+### JavaScript (fetch)
+
+```javascript
+const BASE = 'https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv8rogSjVw1-1SUEdiaL88ZcBZfFg/exec';
+
+const res  = await fetch(BASE);
+const data = await res.json();
+
+console.log(data.next.title);          // "インサイド・ヘッド"
+console.log(data.next.broadcast_text); // "10月9日よる9時放送"
+console.log(data.next.date_key);       // "20261009"
+console.log(data.next.youtube_url);    // "https://www.youtube.com/watch?v=..."
+```
+
+### Python
+
+```python
+import requests
+
+BASE = 'https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv8rogSjVw1-1SUEdiaL88ZcBZfFg/exec'
+
+res  = requests.get(BASE, params={'type': 'next'})
+data = res.json()
+
+print(data['next']['title'])          # インサイド・ヘッド
+print(data['next']['broadcast_text']) # 10月9日よる9時放送
+print(data['next']['date_key'])       # 20261009
+```
+
+---
 
 ## ⚠️ 注意事項
 
-- 本ツールは個人・学習・非商用目的での利用を想定しています
-- 公式サイトの HTML 構造が変わるとパースが壊れる場合があります
-- レスポンスは **1時間キャッシュ** されます（`CACHE_TTL_SECONDS` で変更可能）
+- 個人・学習・非商用目的での利用を想定
+- 公式サイトの HTML 構造が変わるとパースが壊れる場合がある
