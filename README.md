@@ -11,9 +11,6 @@ Google Apps Script (GAS) で動作し、公式サイト [kinro.ntv.co.jp](https:
 https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv8rogSjVw1-1SUEdiaL88ZcBZfFg/exec
 ```
 
-> 元ドキュメントでは使用例側に別の Script ID が混在していたが、本改訂版では上記1つに統一する。  
-> 以降の例では `BASE` にこのURLを代入する。
-
 ---
 
 ## パラメータ
