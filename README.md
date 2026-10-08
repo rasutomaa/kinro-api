@@ -1,21 +1,11 @@
-# 📽️ 金曜ロードショー API（改訂版）
+# 金曜ロードショー API
 
 日本テレビ「金曜ロードショー」の放送スケジュールを JSON で返す非公式 Web API。  
 Google Apps Script (GAS) で動作し、公式サイト [kinro.ntv.co.jp](https://kinro.ntv.co.jp/) から情報を取得する。
 
-## 🔧 改訂ポイント
-
-| # | 元の状態 | 改訂後 |
-|---|---|---|
-| 1 | エンドポイントURLが2種類存在 | **1つに統一** |
-| 2 | 日付形式がバラバラ | `date` と `date_key` の2種類に**統一** |
-| 3 | `?type=detail` のレスポンス仕様が無い | **仕様を追加** |
-| 4 | `?callback=` の仕様・例が無い | **JSONP仕様と例を追加** |
-| 5 | エラー例が1パターンのみ | **エラー一覧を明記** |
-
 ---
 
-## 🌐 エンドポイント
+## エンドポイント
 
 ```
 https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv8rogSjVw1-1SUEdiaL88ZcBZfFg/exec
@@ -26,7 +16,7 @@ https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv
 
 ---
 
-## 📡 パラメータ
+## パラメータ
 
 | パラメータ | 値 | 説明 |
 |---|---|---|
@@ -36,7 +26,7 @@ https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv
 
 ---
 
-## 📅 日付フィールドの統一ルール
+## 日付フィールドの統一ルール
 
 | フィールド | 形式 | 用途 |
 |---|---|---|
@@ -47,7 +37,7 @@ https://script.google.com/macros/s/AKfycbwvEaAgnS1a8fgqeKTMYswgjNmCY14XDPmI09YOv
 
 ---
 
-## 📦 レスポンス仕様
+## レスポンス仕様
 
 ### 共通フィールド
 
